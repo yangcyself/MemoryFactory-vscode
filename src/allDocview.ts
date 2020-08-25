@@ -6,10 +6,12 @@ import { Database } from './database';
 let DocModel = require('./models/document');
 const db = new Database();
 
+
 export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
   constructor(private workspaceRoot: string) {
   }
 
+  // Methods for getting the items and expand to get the childern
   getTreeItem(element: Document): vscode.TreeItem {
     return element;
   }
@@ -30,6 +32,16 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
 		
     }
   }
+
+  // Refresh
+  private _onDidChangeTreeData: vscode.EventEmitter<Document | undefined> = new vscode.EventEmitter<Document | undefined>();
+  readonly onDidChangeTreeData: vscode.Event<Document | undefined> = this._onDidChangeTreeData.event;
+
+
+	refresh(): void {
+    vscode.window.showInformationMessage(`MF: Clicked Refresh`);
+		this._onDidChangeTreeData.fire(null);
+	}
 }
 
 class Document extends vscode.TreeItem {

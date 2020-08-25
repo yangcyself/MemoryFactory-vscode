@@ -35,6 +35,14 @@
 		},
 		"commands":[
 			{
+				"command": "MF-all-documents.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
 				"command": "MemoryFactory.addDoc",
 				"title": "Memory Factory: Add doc"
 			}
@@ -44,6 +52,13 @@
 				{
 					"command": "MemoryFactory.addDoc",
 					"group": "MemoryFactoryGroup@1"
+				}
+			],
+			"view/title": [
+				{
+					"command": "MF-all-documents.refresh",
+					"when": "view == MF-all-documents",
+					"group": "navigation"
 				}
 			]
 		},
