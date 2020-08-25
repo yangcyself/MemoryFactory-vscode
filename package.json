@@ -33,6 +33,12 @@
 				}
 			]
 		},
+		"commands":[
+			{
+				"command": "MemoryFactory.addDoc",
+				"title": "Memory Factory: Add doc"
+			}
+		],
 		"viewsWelcome": []
 	},
 	"scripts": {

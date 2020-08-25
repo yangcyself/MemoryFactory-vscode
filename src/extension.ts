@@ -18,4 +18,5 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const allDocViewProvider =  new AllDocViewProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('MF-all-documents', allDocViewProvider);
+	vscode.commands.registerCommand('MemoryFactory.addDoc', (name:string = vscode.window.activeTextEditor.document.uri.fsPath) => vscode.window.showInformationMessage(`Successfully called add doc.${name}`));
 }
