@@ -39,6 +39,14 @@
 				"title": "Memory Factory: Add doc"
 			}
 		],
+		"menus": {
+			"explorer/context": [
+				{
+					"command": "MemoryFactory.addDoc",
+					"group": "MemoryFactoryGroup@1"
+				}
+			]
+		},
 		"viewsWelcome": []
 	},
 	"scripts": {
