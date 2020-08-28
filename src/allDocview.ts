@@ -13,7 +13,13 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
 
   // Methods for getting the items and expand to get the childern
   getTreeItem(element: Document): vscode.TreeItem {
-    return element;
+    const treeItem = new vscode.TreeItem(element.label, vscode.TreeItemCollapsibleState.None);
+		// if (element.type === vscode.FileType.File) {
+    treeItem.command = { command: 'MemoryFactory.openFile', title: "Open File", arguments: [element.doc_path], };
+    // treeItem.contextValue = 'file';
+    // treeItem.tooltip = "tooltip";
+		// }
+		return treeItem;
   }
 
   getChildren(element?: Document): Thenable<Document[]> {
@@ -24,7 +30,7 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
 		return Promise.resolve( 
       DocModel.find()
 		  .then((doc:[any]) => {
-			return doc.map((d:any)=> new Document(d.label,vscode.TreeItemCollapsibleState.None));
+      return doc.map((d:any)=> new Document(d.label,vscode.TreeItemCollapsibleState.None,d.doc));
 		  })
 		  .catch(err => {
 			console.error(err)
@@ -45,11 +51,15 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
 }
 
 class Document extends vscode.TreeItem {
+  doc_path:string;
+
   constructor(
     public readonly label: string,
     // private version: string,
-    public readonly collapsibleState: vscode.TreeItemCollapsibleState
+    public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+    public readonly doc:string
   ) {
     super(label, collapsibleState);
+    this.doc_path = doc;
   }
 }

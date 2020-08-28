@@ -22,4 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('MF-all-documents', allDocViewProvider);
 	vscode.commands.registerCommand('MF-all-documents.refresh', () => allDocViewProvider.refresh());
 	vscode.commands.registerCommand('MemoryFactory.addDoc', MFaddDoc);
+	vscode.commands.registerCommand('MemoryFactory.openFile', (resource) => {
+		vscode.window.showInformationMessage(`open file ${resource}`);
+		vscode.window.showTextDocument(vscode.Uri.file(resource))});
 }
