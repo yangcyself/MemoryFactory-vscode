@@ -33,7 +33,7 @@
 				}
 			]
 		},
-		"commands":[
+		"commands": [
 			{
 				"command": "MF-all-documents.refresh",
 				"title": "Refresh",
@@ -81,10 +81,11 @@
 		"eslint": "^7.1.0"
 	},
 	"dependencies": {
-		"jsonc-parser": "^0.4.2",
 		"ftp": "^0.3.10",
-		"mongoose": "^5.9",
+		"jsonc-parser": "^0.4.2",
 		"mkdirp": "^0.5.1",
+		"mongoose": "^5.9",
+		"path": "^0.12.7",
 		"rimraf": "^2.6.2"
 	}
 }

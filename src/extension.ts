@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 
 import {AllDocViewProvider} from './allDocview';
 import {MFaddDoc} from './memoryFactory';
+import { join } from 'path';
 
 let DocModel = require('./models/document');
 
@@ -24,5 +25,5 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('MemoryFactory.addDoc', MFaddDoc);
 	vscode.commands.registerCommand('MemoryFactory.openFile', (resource) => {
 		vscode.window.showInformationMessage(`open file ${resource}`);
-		vscode.window.showTextDocument(vscode.Uri.file(resource))});
+		vscode.window.showTextDocument(vscode.Uri.file(join(vscode.workspace.workspaceFolders[0].uri.fsPath, resource)))});
 }
