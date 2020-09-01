@@ -45,6 +45,10 @@
 			{
 				"command": "MemoryFactory.addDoc",
 				"title": "Memory Factory: Add doc"
+			},
+			{
+				"command": "MemoryFactory.addReviewedDate",
+				"title": "Memory Factory: Add review date"
 			}
 		],
 		"menus": {

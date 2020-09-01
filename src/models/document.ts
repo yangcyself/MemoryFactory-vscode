@@ -12,6 +12,10 @@ let docSchema = new mongoose.Schema({
 	reviewed_dates:{
 		type: [Date],
 		required: false
+	},
+	toreview_date:{
+		type:Date,
+		required: true
 	}
 })
 
