@@ -24,6 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('MF-all-documents', allDocViewProvider);
 	vscode.window.registerTreeDataProvider('MF-need-review-doc', needReviewDocViewProvider);
 	vscode.commands.registerCommand('MF-all-documents.refresh', () => allDocViewProvider.refresh());
+	vscode.commands.registerCommand('MF-need-review-doc.refresh', () => needReviewDocViewProvider.refresh());
 	vscode.commands.registerCommand('MemoryFactory.addDoc', MFaddDoc);
 	vscode.commands.registerCommand('MemoryFactory.openFile', (resource) => {
 		vscode.window.showInformationMessage(`open file ${resource}`);
