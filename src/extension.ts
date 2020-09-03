@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 
-import {AllDocViewProvider} from './allDocview';
+import {AllDocViewProvider, NeedReviewDocViewProvider} from './allDocview';
 import {MFaddDoc, MFaddReviewedDate} from './memoryFactory';
 import { join } from 'path';
 
@@ -20,7 +20,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// });
 
 	const allDocViewProvider =  new AllDocViewProvider(vscode.workspace.rootPath);
+	const needReviewDocViewProvider =  new NeedReviewDocViewProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('MF-all-documents', allDocViewProvider);
+	vscode.window.registerTreeDataProvider('MF-need-review-doc', needReviewDocViewProvider);
 	vscode.commands.registerCommand('MF-all-documents.refresh', () => allDocViewProvider.refresh());
 	vscode.commands.registerCommand('MemoryFactory.addDoc', MFaddDoc);
 	vscode.commands.registerCommand('MemoryFactory.openFile', (resource) => {

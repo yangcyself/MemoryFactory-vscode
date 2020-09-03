@@ -30,12 +30,24 @@
 				{
 					"id": "MF-all-documents",
 					"name": "All documents"
+				},
+				{
+					"id": "MF-need-review-doc",
+					"name": "Need Review"
 				}
 			]
 		},
 		"commands": [
 			{
 				"command": "MF-all-documents.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "MF-need-review-doc.refresh",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -62,6 +74,11 @@
 				{
 					"command": "MF-all-documents.refresh",
 					"when": "view == MF-all-documents",
+					"group": "navigation"
+				},
+				{
+					"command": "MF-need-review-doc.refresh",
+					"when": "view == MF-need-review-doc",
 					"group": "navigation"
 				}
 			]
