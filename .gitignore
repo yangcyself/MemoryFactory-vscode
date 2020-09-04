@@ -3,3 +3,4 @@ node_modules
 .vscode
 jsonOutline.ts
 fileExplorer.ts
+USAGE.md
