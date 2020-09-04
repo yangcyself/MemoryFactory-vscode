@@ -16,6 +16,10 @@ let docSchema = new mongoose.Schema({
 	toreview_date:{
 		type:Date,
 		required: true
+	},
+	difficulty:{ // numbers of 20min required
+		type: Number,
+		default: 1
 	}
 })
 
