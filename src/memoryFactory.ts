@@ -63,8 +63,43 @@ export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTe
 	const Doc = await DocModel.findOne({doc: relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath)});
 	Doc.reviewed_dates.push(new Date());
 	// Calc the to review date
-	const toReivew = calcToReviewDate(Doc.reviewed_dates);
+	const targetToReivew:Date = calcToReviewDate(Doc.reviewed_dates);
+	const toReview:Date = await QuickPickDate(targetToReivew);
 	// update the to_review date
-	Doc.toreview_date = toReivew;
+	Doc.toreview_date = toReview;
 	Doc.save();
+}
+
+
+async function QuickPickDate(TargetToReivew:Date): Promise<Date> {
+	let i = 0;
+	const dates:Date[] = [];
+	const TODAY = new Date();
+	const prepostfixlength = 7;
+
+	for (let i = 0; i < prepostfixlength; i++) {
+		const pretmpdate = new Date(TargetToReivew.getTime());
+		pretmpdate.setDate(pretmpdate.getDate()-i);
+		dates[i] = pretmpdate;
+		const posttmpdate = new Date(TargetToReivew.getTime());
+		posttmpdate.setDate(posttmpdate.getDate()+i);
+		dates[i+prepostfixlength] = posttmpdate;
+	}
+	const pickItems = dates.filter(d=> d.getTime()>TODAY.getTime())
+							.map(d => new QuickPickDateItem(d.toDateString(),d,'haha'));
+
+	const result = await vscode.window.showQuickPick(pickItems, {
+		placeHolder: 'eins, zwei or drei',
+		// onDidSelectItem: item => vscode.window.showInformationMessage(`Focus ${++i}: ${item}`)
+	});
+	vscode.window.showInformationMessage(`Got: ${result}`);
+	return  result.date;
+}
+
+class QuickPickDateItem implements vscode.QuickPickItem{
+	constructor(
+		public readonly label: string,
+		public readonly date: Date,
+		public readonly description:string
+	  ){}
 }
