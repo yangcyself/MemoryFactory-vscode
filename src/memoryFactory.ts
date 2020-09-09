@@ -85,23 +85,26 @@ async function QuickPickDate(TargetToReivew:Date): Promise<Date> {
 		posttmpdate.setDate(posttmpdate.getDate()+i);
 		dates[i+prepostfixlength] = posttmpdate;
 	}
-	const pickItems:Thenable<QuickPickDateItem[]> = Promise.all( dates.filter(d=> d.getTime()>TODAY.getTime())
+	const pickItems:QuickPickDateItem[] = await Promise.all( dates.filter(d=> d.getTime()>TODAY.getTime())
 							.map(async (d) => { const tod0 = new Date(d.getTime()); tod0.setUTCHours(0,0,0);
 										const tom0 = new Date(tod0.getTime()); tom0.setDate(tod0.getDate()+1);
-										const c = await DocModel.countDocuments({
+										const c_num:string = await DocModel.countDocuments({ // Here the Type System CANNOT Tell that Mongoose Returned a NUMBER !!!!!!!
 											toreview_date: {
 												$lt: tom0,
 												$gte: tod0
 											}},
-											(err:any,count:number)=>String(count));  // Count the elements in the list
+											(err:any,count:number)=>String(count)
+											);  // Count the elements in the list
+										const c:string = String(c_num);
 								return new QuickPickDateItem(d.toDateString(),d, c);
-								}));
-	
-	const result = await vscode.window.showQuickPick(pickItems, {
-		placeHolder: 'eins, zwei or drei',
+								})).then((values)=>{
+									// console.log(values);
+									return values;});
+	const result:QuickPickDateItem = await vscode.window.showQuickPick(pickItems, {
+		placeHolder: 'Please select the date to review this document',
 		// onDidSelectItem: item => vscode.window.showInformationMessage(`Focus ${++i}: ${item}`)
 	});
-	vscode.window.showInformationMessage(`Got: ${result}`);
+	// vscode.window.showInformationMessage(`Got: ${result}`);
 	return  result.date;
 }
 
@@ -111,4 +114,9 @@ class QuickPickDateItem implements vscode.QuickPickItem{
 		public readonly date: Date,
 		public readonly description:string
 	  ){}
+}
+
+
+function sleep(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms*1000) );
 }

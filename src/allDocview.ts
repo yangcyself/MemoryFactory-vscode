@@ -81,7 +81,6 @@ export class NeedReviewDocViewProvider implements vscode.TreeDataProvider<Docume
 		  .catch(err => {
 			console.error(err)
 		  }) );
-		
     }
   }
 
