@@ -85,8 +85,17 @@ async function QuickPickDate(TargetToReivew:Date): Promise<Date> {
 		posttmpdate.setDate(posttmpdate.getDate()+i);
 		dates[i+prepostfixlength] = posttmpdate;
 	}
-	const pickItems = dates.filter(d=> d.getTime()>TODAY.getTime())
-							.map(d => new QuickPickDateItem(d.toDateString(),d,'haha'));
+	const pickItems:QuickPickDateItem[] = dates.filter(d=> d.getTime()>TODAY.getTime())
+							.map(d => { const tod0 = new Date(d.getTime()); tod0.setUTCHours(0,0,0);
+										const tom0 = new Date(tod0.getTime()); tom0.setDate(tod0.getDate()+1);
+								return new QuickPickDateItem(d.toDateString(),d, 
+								DocModel.countDocuments({
+									toreview_date: {
+										$lt: tom0,
+										$gte: tod0
+									}},
+									(err:any,count:number)=>String(count))  // Count the elements in the list
+							)});
 
 	const result = await vscode.window.showQuickPick(pickItems, {
 		placeHolder: 'eins, zwei or drei',
