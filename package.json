@@ -59,6 +59,10 @@
 				"title": "Memory Factory: Add doc"
 			},
 			{
+				"command": "MemoryFactory.deleteDoc",
+				"title": "Memory Factory: delete doc"
+			},
+			{
 				"command": "MemoryFactory.addReviewedDate",
 				"title": "Memory Factory: Add review date"
 			}
@@ -80,6 +84,12 @@
 					"command": "MF-need-review-doc.refresh",
 					"when": "view == MF-need-review-doc",
 					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "MemoryFactory.deleteDoc",
+					"when": "view == MF-all-documents || view == MF-need-review-doc"
 				}
 			]
 		},

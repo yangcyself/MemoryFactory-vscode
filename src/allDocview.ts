@@ -95,7 +95,7 @@ export class NeedReviewDocViewProvider implements vscode.TreeDataProvider<Docume
 	}
 }
 
-class Document extends vscode.TreeItem {
+export class Document extends vscode.TreeItem {
   doc_path:string;
 
   constructor(

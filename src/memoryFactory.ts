@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { relative } from 'path';
-
+import { relative,isAbsolute } from 'path';
+import {Document as DocViewItem} from './allDocview';
 
 let DocModel = require('./models/document');
 
@@ -27,7 +27,11 @@ function calcToReviewDate(reviewed_dates:[Date]):Date{
 
 export function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.document.uri){
 	//vscode.workspace.workspaceFolders[0]: The rootPath
-	vscode.window.showInformationMessage(`Successfully called add doc.${name.fsPath}\nFrom workSpaceFolder${vscode.workspace.workspaceFolders[0].name}`);
+	// vscode.window.showInformationMessage(`Successfully called add doc.${name.fsPath}\nFrom workSpaceFolder${vscode.workspace.workspaceFolders[0].name}`);
+	if(!isSubDirectory(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath)){
+		vscode.window.showInformationMessage('trying to add a doc not in workspace: ${name.fspath}');
+		return;
+	}
 	const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
 	let msg = new DocModel({
 		doc: relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath),
@@ -39,6 +43,28 @@ export function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.docume
 		console.error(err);
 	});
 }
+
+
+//! I put an 'any' below to bypass the type checker. TODO: find a better way to do this.
+//! Note both types are needed as they are arugments from treeview context and from direct command line
+export function MFdeleteDoc(name:vscode.Uri|DocViewItem|any = vscode.window.activeTextEditor.document.uri){
+	console.log(typeof(name),name);
+	// typeof(name)==DocViewItem;
+	const relapath = name.fsPath? relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
+	vscode.window.showInformationMessage(`Successfully called delete doc.${relapath}`);
+	DocModel
+	.findOneAndRemove({
+		doc: relapath,
+	})
+	.then(response => {
+		console.log(response)
+	})
+	.catch(err => {
+		vscode.window.showInformationMessage(err);
+		console.error(err)
+	});
+}
+
 
 export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTextEditor.document.uri){
 	//vscode.workspace.workspaceFolders[0]: The rootPath
@@ -120,3 +146,8 @@ class QuickPickDateItem implements vscode.QuickPickItem{
 function sleep(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms*1000) );
 }
+
+function isSubDirectory(parent, child) {
+	const rela = relative(parent, child);
+	return rela && !rela.startsWith('..') && !isAbsolute(rela);;
+  }
