@@ -65,6 +65,10 @@
 			{
 				"command": "MemoryFactory.addReviewedDate",
 				"title": "Memory Factory: Add review date"
+			},
+			{
+				"command": "MemoryFactory.setToreviewDate",
+				"title": "Memory Factory: set toreivew date"
 			}
 		],
 		"menus": {
@@ -89,6 +93,10 @@
 			"view/item/context": [
 				{
 					"command": "MemoryFactory.deleteDoc",
+					"when": "view == MF-all-documents || view == MF-need-review-doc"
+				},
+				{
+					"command": "MemoryFactory.setToreviewDate",
 					"when": "view == MF-all-documents || view == MF-need-review-doc"
 				}
 			]
@@ -115,6 +123,7 @@
 		"ftp": "^0.3.10",
 		"jsonc-parser": "^0.4.2",
 		"mkdirp": "^0.5.1",
+		"moment": "^2.28.0",
 		"mongoose": "^5.9",
 		"path": "^0.12.7",
 		"rimraf": "^2.6.2"

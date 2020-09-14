@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 
 import {AllDocViewProvider, NeedReviewDocViewProvider} from './allDocview';
-import {MFaddDoc, MFdeleteDoc, MFaddReviewedDate} from './memoryFactory';
+import {MFaddDoc, MFdeleteDoc, MFaddReviewedDate, MFsetToReviewDate} from './memoryFactory';
 import { join } from 'path';
 
 let DocModel = require('./models/document');
@@ -27,6 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('MF-need-review-doc.refresh', () => needReviewDocViewProvider.refresh());
 	vscode.commands.registerCommand('MemoryFactory.addDoc', MFaddDoc);
 	vscode.commands.registerCommand('MemoryFactory.deleteDoc', MFdeleteDoc);
+	vscode.commands.registerCommand('MemoryFactory.setToreviewDate', MFsetToReviewDate);
 	vscode.commands.registerCommand('MemoryFactory.openFile', (resource) => {
 		vscode.window.showInformationMessage(`open file ${resource}`);
 		vscode.window.showTextDocument(vscode.Uri.file(join(vscode.workspace.workspaceFolders[0].uri.fsPath, resource)))});

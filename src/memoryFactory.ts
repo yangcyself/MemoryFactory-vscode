@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { relative,isAbsolute } from 'path';
+import * as moment from 'moment'; // to validate date string
 import {Document as DocViewItem} from './allDocview';
 
 let DocModel = require('./models/document');
@@ -95,6 +96,32 @@ export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTe
 	Doc.toreview_date = toReview;
 	Doc.save();
 }
+
+
+export async function MFsetToReviewDate(name:vscode.Uri|DocViewItem|any = vscode.window.activeTextEditor.document.uri){
+	console.log(typeof(name),name);
+	const relapath = name.fsPath? relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
+	const Doc = await DocModel.findOne({doc: relapath});
+	// Calc the to review date
+	const toReview:Date = await InputDate(Doc.toreview_date);
+	// update the to_review date
+	Doc.toreview_date = toReview;
+	Doc.save();
+}
+
+async function InputDate(TargetToReivew:Date): Promise<Date> {
+	const result = await vscode.window.showInputBox({
+		value: TargetToReivew.toISOString().substring(0,10),
+		valueSelection: [8, 10],
+		placeHolder: 'YYYY-MM-DD',
+		validateInput: (text:string) => {
+			return moment(text, "YYYY-MM-DD", true).isValid() ? null : "please input YYYY-MM-DD";
+		}
+	});
+	vscode.window.showInformationMessage(`Got: ${result}`);
+	return new Date(result);
+}
+
 
 
 async function QuickPickDate(TargetToReivew:Date): Promise<Date> {
