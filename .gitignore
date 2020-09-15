@@ -4,3 +4,4 @@ node_modules
 jsonOutline.ts
 fileExplorer.ts
 USAGE.md
+package-lock.json
