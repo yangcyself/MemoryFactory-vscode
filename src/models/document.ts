@@ -1,12 +1,14 @@
-// export{}
-let mongoose = require('mongoose');
+// let mongoose = require('mongoose');
+var mongoose = require('mongoose');
 import  * as path from 'path';
-
+import { pathgetter,pathsetter } from "../utils/pathutil";
 let docSchema = new mongoose.Schema({
-	path: {
-		type: [String],
+	doc: {
+		type: String,
 		required: true,
 		unique: true,
+		set:pathsetter,
+		get:pathgetter
 	},
 	label:{
 		type: String
@@ -25,23 +27,16 @@ let docSchema = new mongoose.Schema({
 	}
 })
 
-docSchema.virtual('doc').get(function() {
-	return path.join.apply(path,this.path);
+
+// returns an array of paths of the parent directories
+// Using fat arrow functions will change what `this` refers to.
+docSchema.virtual('ancestors').get(function() {
+	const pathItems = this.doc.split(path.posix.sep);
+	const ancsArray:string[] = [pathItems[0]];
+	for (let i = 1; i < pathItems.length; i++) {
+		ancsArray.push(path.join(ancsArray[ancsArray.length - 1],pathItems[i]));
+	}
+	return ancsArray;
 })
-
-docSchema.virtual('doc').set(function(doc_path:string) {
-	console.log(doc_path.split(path.sep));
-	this.path =  doc_path.split(path.sep);
-	console.log(this.path);
-})
-
-// // returns an array of relapahts of the parent directories
-// // Using fat arrow functions will change what `this` refers to.
-// docSchema.virtual('ancestors').get(function() {
-
-// 	const ancsArray:string[] = [];
-// 	const ancsNames:string[] = [];
-// 	return 
-// })
 
 module.exports = mongoose.model('Documents', docSchema);

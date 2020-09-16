@@ -4,10 +4,11 @@ import * as vscode from 'vscode';
 
 import {AllDocViewProvider, NeedReviewDocViewProvider} from './allDocview';
 import {MFaddDoc, MFdeleteDoc, MFaddReviewedDate, MFsetToReviewDate} from './memoryFactory';
+import {MFaddGroup} from './memoryFactory';
 import { join } from 'path';
 
 let DocModel = require('./models/document');
-
+let groupModel = require('./models/group');
 
 export function activate(context: vscode.ExtensionContext) {
 	// let msg = new DocModel({
@@ -32,4 +33,6 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage(`open file ${resource}`);
 		vscode.window.showTextDocument(vscode.Uri.file(join(vscode.workspace.workspaceFolders[0].uri.fsPath, resource)))});
 	vscode.commands.registerCommand('MemoryFactory.addReviewedDate', MFaddReviewedDate);
+	// group related commands
+	vscode.commands.registerCommand('MemoryFactory.addGroup', MFaddGroup);
 }

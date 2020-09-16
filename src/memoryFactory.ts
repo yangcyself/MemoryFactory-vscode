@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
-import { relative,isAbsolute } from 'path';
+import  * as path from 'path';
 import * as moment from 'moment'; // to validate date string
 import {Document as DocViewItem} from './allDocview';
 
 let DocModel = require('./models/document');
+let groupModel = require('./models/group');
 
 function calcToReviewDate(reviewed_dates:[Date]):Date{
 	var reviewRank = 0;
@@ -35,7 +36,7 @@ export function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.docume
 	}
 	const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
 	let msg = new DocModel({
-		doc: relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath),
+		doc: path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath),
 		label: name.fsPath.replace(/^.*[\\\/]/, ''),
 		toreview_date: tomorrow,
 		reviewed_dates:[new Date()]
@@ -51,7 +52,7 @@ export function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.docume
 export function MFdeleteDoc(name:vscode.Uri|DocViewItem|any = vscode.window.activeTextEditor.document.uri){
 	console.log(typeof(name),name);
 	// typeof(name)==DocViewItem;
-	const relapath = name.fsPath? relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
+	const relapath = name.fsPath? path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
 	vscode.window.showInformationMessage(`Successfully called delete doc.${relapath}`);
 	DocModel
 	.findOneAndRemove({
@@ -73,7 +74,7 @@ export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTe
 	// TODO: change this part an atomic operation (although not required in MF)
 
 	// DocModel.findOneAndUpdate(
-	// 	{ doc: relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath)}, 
+	// 	{ doc: path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath)}, 
 	// 	{ $push: { reviewed_dates: new Date() }},
 	// 	{
 	// 		new: true,                       // return updated doc
@@ -87,7 +88,7 @@ export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTe
 	//   });
 
 	// push the reviewed_date
-	const Doc = await DocModel.findOne({doc: relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath)});
+	const Doc = await DocModel.findOne({doc: path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath)});
 	Doc.reviewed_dates.push(new Date());
 	// Calc the to review date
 	const targetToReivew:Date = calcToReviewDate(Doc.reviewed_dates);
@@ -100,7 +101,7 @@ export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTe
 
 export async function MFsetToReviewDate(name:vscode.Uri|DocViewItem|any = vscode.window.activeTextEditor.document.uri){
 	console.log(typeof(name),name);
-	const relapath = name.fsPath? relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
+	const relapath = name.fsPath? path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
 	const Doc = await DocModel.findOne({doc: relapath});
 	// Calc the to review date
 	const toReview:Date = await InputDate(Doc.toreview_date);
@@ -169,12 +170,38 @@ class QuickPickDateItem implements vscode.QuickPickItem{
 	  ){}
 }
 
+// Group related methods
+
+export async function MFaddGroup(name:vscode.Uri|DocViewItem|any = vscode.window.activeTextEditor.document.uri){
+	if(!isSubDirectory(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath)){
+		vscode.window.showInformationMessage('trying to add a doc not in workspace: ${name.fspath}');
+		return;
+	}
+	const relapath:string = name.fsPath? path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
+	const result = await vscode.window.showInputBox({
+		value: path.dirname(relapath),
+		valueSelection: [relapath.length,relapath.length],
+		placeHolder: 'path of group',
+		validateInput: (text:string) => {
+			return isSubDirectory(text, relapath) ? null : "The group should be an ancestor of the file";
+		}
+	});
+	let msg = new groupModel({
+		path: result,
+		label:path.basename(result),	
+	});
+	msg.save().catch((err:any)=>{
+		console.error(err);
+	});
+}
+
+
 
 function sleep(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms*1000) );
 }
 
 function isSubDirectory(parent, child) {
-	const rela = relative(parent, child);
-	return rela && !rela.startsWith('..') && !isAbsolute(rela);;
+	const rela = path.relative(parent, child);
+	return rela && !rela.startsWith('..') && !path.isAbsolute(rela);;
   }

@@ -69,6 +69,10 @@
 			{
 				"command": "MemoryFactory.setToreviewDate",
 				"title": "Memory Factory: set toreivew date"
+			},
+			{
+				"command": "MemoryFactory.addGroup",
+				"title": "Memory Factory: Add group"
 			}
 		],
 		"menus": {
