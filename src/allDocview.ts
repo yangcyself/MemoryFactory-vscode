@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { Database } from './database';
 
 let DocModel = require('./models/document');
+let GroupModel = require('./models/group');
 const db = new Database();
 
 
@@ -24,21 +25,33 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
     return element
   }
 
-  getChildren(element?: Document): Thenable<Document[]> {
+  getChildren(element?: AllDocViewElement): Thenable<Document[]> {
 
-    if (element) {
-		return Promise.resolve([]);
-    } else {
-		return Promise.resolve( 
-      DocModel.find()
-		  .then((doc:[any]) => {
-      return doc.map((d:any)=> new Document(d.label,  vscode.TreeItemCollapsibleState.None,
-                                            d.doc,    d.toreview_date));
-		  })
-		  .catch(err => {
-			console.error(err)
-		  }) );
-		
+    if (element && element.elemType==AllDocViewElementType.document) {
+		  return Promise.resolve([]);
+    } else if (element && element.elemType==AllDocViewElementType.group){
+      return Promise.resolve( 
+        DocModel.find(
+          {"ancestors": element.doc_path}
+        )
+        .then((doc:[any]) => {
+        return doc.map((d:any)=> new Document(d.label,  vscode.TreeItemCollapsibleState.None,
+                                              d.doc,    d.toreview_date));
+        })
+        .catch(err => {
+        console.error(err)
+        }) );
+    } else { // Root 
+      return Promise.resolve(
+        GroupModel.find()
+        .then((doc:[any]) => {
+          return doc.map((d:any)=> new Group(d.label,  vscode.TreeItemCollapsibleState.Collapsed,
+                                                d.path));
+        })
+        .catch(err => {
+          console.error(err)
+        })
+      );
     }
   }
 
@@ -95,20 +108,42 @@ export class NeedReviewDocViewProvider implements vscode.TreeDataProvider<Docume
 	}
 }
 
-export class Document extends vscode.TreeItem {
-  doc_path:string;
+enum AllDocViewElementType{
+  document,
+  group
+}
+interface AllDocViewElement{
+  elemType:AllDocViewElementType
+  readonly doc_path:string
+}
 
+
+export class Document extends vscode.TreeItem implements AllDocViewElement{
+  elemType:AllDocViewElementType
   constructor(
     public readonly label: string,
     // private version: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-    public readonly doc:string,
+    public readonly doc_path:string,
     public readonly toReivewDate:Date
   ) {
     super(label, collapsibleState);
-    this.doc_path = doc;
+    // this.doc_path = doc;
+    this.elemType = AllDocViewElementType.document;
     this.command = { command: 'MemoryFactory.openFile', title: "Open File", arguments: [this.doc_path], };
-    this.toReivewDate = toReivewDate;
     this.description = toReivewDate.toDateString();
+  }
+}
+
+class Group extends vscode.TreeItem implements AllDocViewElement{
+  elemType:AllDocViewElementType
+  constructor(
+    public readonly label: string,
+    // private version: string,
+    public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+    public readonly doc_path:string
+  ) {
+    super(label, collapsibleState);
+    this.elemType = AllDocViewElementType.group;
   }
 }

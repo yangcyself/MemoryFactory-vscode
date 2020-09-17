@@ -178,7 +178,7 @@ export async function MFaddGroup(name:vscode.Uri|DocViewItem|any = vscode.window
 		return;
 	}
 	const relapath:string = name.fsPath? path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
-	const result = await vscode.window.showInputBox({
+	const path_result = await vscode.window.showInputBox({
 		value: path.dirname(relapath),
 		valueSelection: [relapath.length,relapath.length],
 		placeHolder: 'path of group',
@@ -186,9 +186,14 @@ export async function MFaddGroup(name:vscode.Uri|DocViewItem|any = vscode.window
 			return isSubDirectory(text, relapath) ? null : "The group should be an ancestor of the file";
 		}
 	});
+	const label_result = await vscode.window.showInputBox({
+		value: path.basename(path_result),
+		// valueSelection: [0,path.basename(path_result).length],
+		placeHolder: 'name of group',
+	});
 	let msg = new groupModel({
-		path: result,
-		label:path.basename(result),	
+		path: path_result,
+		label:label_result,	
 	});
 	msg.save().catch((err:any)=>{
 		console.error(err);
