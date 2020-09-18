@@ -15,6 +15,10 @@ let groupSchema = new mongoose.Schema({
 	difficulty:{ // numbers of 20min required
 		type: Number,
 		default: 1
+	},
+	reviewLevel:{ // the factor for calculating the reviewperiod
+		type: Number,
+		default: 1
 	}
 })
 

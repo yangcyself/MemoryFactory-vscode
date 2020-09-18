@@ -27,7 +27,7 @@ function calcToReviewDate(reviewed_dates:[Date]):Date{
 	return toReviewDate;
 }
 
-export function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.document.uri){
+export async function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.document.uri){
 	//vscode.workspace.workspaceFolders[0]: The rootPath
 	// vscode.window.showInformationMessage(`Successfully called add doc.${name.fsPath}\nFrom workSpaceFolder${vscode.workspace.workspaceFolders[0].name}`);
 	if(!isSubDirectory(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath)){
@@ -35,13 +35,24 @@ export function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.docume
 		return;
 	}
 	const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+	const label_result = await vscode.window.showInputBox({
+		value: path.basename(name.fsPath,path.extname(name.fsPath)),
+		placeHolder: 'name of doc',
+	});
 	let msg = new DocModel({
 		doc: path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath),
-		label: name.fsPath.replace(/^.*[\\\/]/, ''),
+		// label: name.fsPath.replace(/^.*[\\\/]/, ''),
+		label: label_result,
 		toreview_date: tomorrow,
 		reviewed_dates:[new Date()]
 	});
-	msg.save().catch((err:any)=>{
+	
+	msg.save()
+	.then((msg:any)=>{
+		vscode.commands.executeCommand('MF-all-documents.refresh');
+		vscode.commands.executeCommand('MF-need-review-doc.refresh');
+	})
+	.catch((err:any)=>{
 		console.error(err);
 	});
 }
@@ -53,13 +64,14 @@ export function MFdeleteDoc(name:vscode.Uri|DocViewItem|any = vscode.window.acti
 	console.log(typeof(name),name);
 	// typeof(name)==DocViewItem;
 	const relapath = name.fsPath? path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
-	vscode.window.showInformationMessage(`Successfully called delete doc.${relapath}`);
 	DocModel
 	.findOneAndRemove({
 		doc: relapath,
 	})
 	.then(response => {
-		console.log(response)
+		console.log(response);
+		vscode.commands.executeCommand('MF-all-documents.refresh');
+		vscode.commands.executeCommand('MF-need-review-doc.refresh');
 	})
 	.catch(err => {
 		vscode.window.showInformationMessage(err);
@@ -95,7 +107,14 @@ export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTe
 	const toReview:Date = await QuickPickDate(targetToReivew);
 	// update the to_review date
 	Doc.toreview_date = toReview;
-	Doc.save();
+	Doc.save()
+	.then((msg:any)=>{
+		vscode.commands.executeCommand('MF-all-documents.refresh');
+		vscode.commands.executeCommand('MF-need-review-doc.refresh');
+	})
+	.catch(err=>{
+		console.log(err);
+	});
 }
 
 
@@ -107,7 +126,14 @@ export async function MFsetToReviewDate(name:vscode.Uri|DocViewItem|any = vscode
 	const toReview:Date = await InputDate(Doc.toreview_date);
 	// update the to_review date
 	Doc.toreview_date = toReview;
-	Doc.save();
+	Doc.save()
+	.then((msg:any)=>{
+		vscode.commands.executeCommand('MF-all-documents.refresh');
+		vscode.commands.executeCommand('MF-need-review-doc.refresh');
+	})
+	.catch(err=>{
+		console.log(err);
+	});
 }
 
 async function InputDate(TargetToReivew:Date): Promise<Date> {
@@ -195,7 +221,12 @@ export async function MFaddGroup(name:vscode.Uri|DocViewItem|any = vscode.window
 		path: path_result,
 		label:label_result,	
 	});
-	msg.save().catch((err:any)=>{
+	msg.save()
+	.then((msg:any)=>{
+		vscode.commands.executeCommand('MF-all-documents.refresh');
+		vscode.commands.executeCommand('MF-need-review-doc.refresh');
+	})
+	.catch((err:any)=>{
 		console.error(err);
 	});
 }

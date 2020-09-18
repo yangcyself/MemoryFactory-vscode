@@ -61,10 +61,10 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
 
 
 	refresh(): void {
-    vscode.window.showInformationMessage(`MF: Clicked Refresh`);
 		this._onDidChangeTreeData.fire(null);
 	}
 }
+
 
 export class NeedReviewDocViewProvider implements vscode.TreeDataProvider<Document> {
   constructor(private workspaceRoot: string) {
@@ -88,8 +88,10 @@ export class NeedReviewDocViewProvider implements vscode.TreeDataProvider<Docume
       }
       })
 		  .then((doc:[any]) => {
-      return doc.map((d:any)=> new Document(d.label,  vscode.TreeItemCollapsibleState.None,
-                                            d.doc,    d.toreview_date));
+      return Promise.all(doc.map(async (d:any) =>  {
+        const g = await GroupModel.findOne({"path":{"$in":d.ancestors}}).catch(err =>{console.error(err)});
+        return new Document(`${g.label} ${d.label}`,  vscode.TreeItemCollapsibleState.None,
+                                            d.doc,    d.toreview_date)}));
 		  })
 		  .catch(err => {
 			console.error(err)
@@ -103,7 +105,6 @@ export class NeedReviewDocViewProvider implements vscode.TreeDataProvider<Docume
 
 
 	refresh(): void {
-    vscode.window.showInformationMessage(`MF: Clicked Refresh`);
 		this._onDidChangeTreeData.fire(null);
 	}
 }
