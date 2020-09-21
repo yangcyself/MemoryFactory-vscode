@@ -105,7 +105,12 @@
 				}
 			]
 		},
-		"viewsWelcome": []
+		"viewsWelcome": [
+			{
+				"view": "MF-all-documents",
+				"contents": "No Document Repository Found. Try add repo to initialize the current workspace for memory facotry \n[Add Repo](command:reportDetails.addEntry)"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -130,6 +135,7 @@
 		"moment": "^2.28.0",
 		"mongoose": "^5.9",
 		"path": "^0.12.7",
-		"rimraf": "^2.6.2"
+		"rimraf": "^2.6.2",
+		"simple-git": "^2.20.1"
 	}
 }

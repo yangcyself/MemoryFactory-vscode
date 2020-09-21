@@ -9,7 +9,7 @@ const db = new Database();
 
 
 export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
-  constructor(private workspaceRoot: string) {
+  constructor(private workspaceRepo: string) {
   }
 
   // Methods for getting the items and expand to get the childern
@@ -67,7 +67,7 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
 
 
 export class NeedReviewDocViewProvider implements vscode.TreeDataProvider<Document> {
-  constructor(private workspaceRoot: string) {
+  constructor(private workspaceRepo: string) {
   }
 
   // Methods for getting the items and expand to get the childern
