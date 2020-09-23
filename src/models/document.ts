@@ -27,6 +27,10 @@ let docSchema = new mongoose.Schema({
 	},
 	ancestors:{
 		type: [String]
+	},
+	repository:{
+		type: String,
+		required: true
 	}
 })
 

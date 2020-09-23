@@ -2,14 +2,18 @@ import * as vscode from 'vscode';
 // import * as fs from 'fs';
 // import * as path from 'path';
 import { Database } from './database';
+import simpleGit, {SimpleGit,SimpleGitOptions} from 'simple-git'; // used in singelon repoUrl
+
 
 let DocModel = require('./models/document');
 let GroupModel = require('./models/group');
+
 const db = new Database();
 
 
 export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
   constructor(private workspaceRepo: string) {
+    
   }
 
   // Methods for getting the items and expand to get the childern
@@ -32,7 +36,8 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
     } else if (element && element.elemType==AllDocViewElementType.group){
       return Promise.resolve( 
         DocModel.find(
-          {"ancestors": element.doc_path}
+          {"ancestors": element.doc_path,
+           "repository":repoURL.url}
         )
         .then((doc:[any]) => {
         return doc.map((d:any)=> new Document(d.label,  vscode.TreeItemCollapsibleState.None,
@@ -43,7 +48,7 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
         }) );
     } else { // Root 
       return Promise.resolve(
-        GroupModel.find()
+        GroupModel.find({"repository":repoURL.url})
         .then((doc:[any]) => {
           return doc.map((d:any)=> new Group(d.label,  vscode.TreeItemCollapsibleState.Collapsed,
                                                 d.path));
@@ -61,6 +66,7 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
 
 
 	refresh(): void {
+    repoURL.refresh();
 		this._onDidChangeTreeData.fire(null);
 	}
 }
@@ -83,13 +89,15 @@ export class NeedReviewDocViewProvider implements vscode.TreeDataProvider<Docume
     } else {
 		return Promise.resolve( 
       DocModel.find({
-        toreview_date: {
-          $lte: today24
-      }
+        "toreview_date": {
+          "$lte": today24
+      },
+        "repository" : repoURL.url
       })
 		  .then((doc:[any]) => {
       return Promise.all(doc.map(async (d:any) =>  {
-        const g = await GroupModel.findOne({"path":{"$in":d.ancestors}}).catch(err =>{console.error(err)});
+        const g = await GroupModel.findOne({"path":{"$in":d.ancestors},
+                                            "repository":repoURL.url}).catch(err =>{console.error(err)});
         return new Document(`${g.label} ${d.label}`,  vscode.TreeItemCollapsibleState.None,
                                             d.doc,    d.toreview_date)}));
 		  })
@@ -105,6 +113,7 @@ export class NeedReviewDocViewProvider implements vscode.TreeDataProvider<Docume
 
 
 	refresh(): void {
+    repoURL.refresh();
 		this._onDidChangeTreeData.fire(null);
 	}
 }
@@ -148,3 +157,42 @@ class Group extends vscode.TreeItem implements AllDocViewElement{
     this.elemType = AllDocViewElementType.group;
   }
 }
+
+
+class RepoURL
+{
+    private static _instance: RepoURL;
+
+    private constructor()
+    {
+      this.refresh();
+    }
+
+    public static get Instance()
+    {
+        return this._instance || (this._instance = new this());
+    }
+
+    private _url:String|void;
+    
+    public get url() {return this._url};
+
+    public async refresh() { 
+      if (!this._url) this._url = await this.getUrl();
+      if (this._url) this._url = this._url.trim();
+    }
+
+    private getUrl(): Promise<String|void>{	
+        const options: SimpleGitOptions = {
+          baseDir: vscode.workspace.rootPath,
+          binary: 'git',
+          maxConcurrentProcesses: 6,
+        };
+        const git: SimpleGit = simpleGit(options);
+        const gitroot =  git.remote(['get-url','origin']);
+        return gitroot;
+    }
+
+}
+
+export const repoURL = RepoURL.Instance;

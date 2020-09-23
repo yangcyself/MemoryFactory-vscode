@@ -19,6 +19,10 @@ let groupSchema = new mongoose.Schema({
 	reviewLevel:{ // the factor for calculating the reviewperiod
 		type: Number,
 		default: 1
+	},
+	repository:{
+		type: String,
+		required: true
 	}
 })
 

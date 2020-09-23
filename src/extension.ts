@@ -7,9 +7,6 @@ import {MFaddDoc, MFdeleteDoc, MFaddReviewedDate, MFsetToReviewDate} from './mem
 import {MFaddGroup} from './memoryFactory';
 import { join } from 'path';
 
-import simpleGit, {SimpleGit,SimpleGitOptions} from 'simple-git';
-
-let repoModel = require('./models/repository');
 
 export async function activate(context: vscode.ExtensionContext) {
 	// let msg = new DocModel({
@@ -20,16 +17,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	// msg.save().catch((err:any)=>{
 	// 	console.error(err);
 	// })
-	const options: SimpleGitOptions = {
-		baseDir: vscode.workspace.rootPath,
-		binary: 'git',
-		maxConcurrentProcesses: 6,
-	 };
-	const git: SimpleGit = simpleGit(options);
-	const gitroot = await git.remote(['get-url','origin']);
-	const repo = await repoModel.findOne({"path":gitroot});
-	console.log(`repo${repo}`);
-	if(!repo){return;}
 	
 	const allDocViewProvider =  new AllDocViewProvider(vscode.workspace.rootPath);
 	const needReviewDocViewProvider =  new NeedReviewDocViewProvider(vscode.workspace.rootPath);

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import  * as path from 'path';
 import * as moment from 'moment'; // to validate date string
 import {Document as DocViewItem} from './allDocview';
+import {repoURL} from "./allDocview";
 
 let DocModel = require('./models/document');
 let groupModel = require('./models/group');
@@ -38,13 +39,15 @@ export async function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.
 	const label_result = await vscode.window.showInputBox({
 		value: path.basename(name.fsPath,path.extname(name.fsPath)),
 		placeHolder: 'name of doc',
+		prompt: "name of the document"
 	});
 	let msg = new DocModel({
 		doc: path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath),
 		// label: name.fsPath.replace(/^.*[\\\/]/, ''),
 		label: label_result,
 		toreview_date: tomorrow,
-		reviewed_dates:[new Date()]
+		reviewed_dates:[new Date()],
+		repository: repoURL.url
 	});
 	
 	msg.save()
@@ -55,6 +58,13 @@ export async function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.
 	.catch((err:any)=>{
 		console.error(err);
 	});
+	
+	const g = await groupModel.findOne({"path":{"$in":msg.ancestors},
+										"repository":repoURL.url})
+							.catch(err =>{console.error(err)});
+	if(!g){ // the doc does not belongs to any group
+		await MFaddGroup(name);
+	}
 }
 
 
@@ -67,6 +77,7 @@ export function MFdeleteDoc(name:vscode.Uri|DocViewItem|any = vscode.window.acti
 	DocModel
 	.findOneAndRemove({
 		doc: relapath,
+		repository: repoURL.url
 	})
 	.then(response => {
 		console.log(response);
@@ -100,7 +111,8 @@ export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTe
 	//   });
 
 	// push the reviewed_date
-	const Doc = await DocModel.findOne({doc: path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath)});
+	const Doc = await DocModel.findOne({doc: path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath),
+										repository:repoURL.url});
 	Doc.reviewed_dates.push(new Date());
 	// Calc the to review date
 	const targetToReivew:Date = calcToReviewDate(Doc.reviewed_dates);
@@ -121,7 +133,7 @@ export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTe
 export async function MFsetToReviewDate(name:vscode.Uri|DocViewItem|any = vscode.window.activeTextEditor.document.uri){
 	console.log(typeof(name),name);
 	const relapath = name.fsPath? path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
-	const Doc = await DocModel.findOne({doc: relapath});
+	const Doc = await DocModel.findOne({doc: relapath, repository:repoURL.url});
 	// Calc the to review date
 	const toReview:Date = await InputDate(Doc.toreview_date);
 	// update the to_review date
@@ -141,6 +153,7 @@ async function InputDate(TargetToReivew:Date): Promise<Date> {
 		value: TargetToReivew.toISOString().substring(0,10),
 		valueSelection: [8, 10],
 		placeHolder: 'YYYY-MM-DD',
+		prompt: "the date for next review",
 		validateInput: (text:string) => {
 			return moment(text, "YYYY-MM-DD", true).isValid() ? null : "please input YYYY-MM-DD";
 		}
@@ -208,6 +221,7 @@ export async function MFaddGroup(name:vscode.Uri|DocViewItem|any = vscode.window
 		value: path.dirname(relapath),
 		valueSelection: [relapath.length,relapath.length],
 		placeHolder: 'path of group',
+		prompt: "path of the group",
 		validateInput: (text:string) => {
 			return isSubDirectory(text, relapath) ? null : "The group should be an ancestor of the file";
 		}
@@ -216,10 +230,12 @@ export async function MFaddGroup(name:vscode.Uri|DocViewItem|any = vscode.window
 		value: path.basename(path_result),
 		// valueSelection: [0,path.basename(path_result).length],
 		placeHolder: 'name of group',
+		prompt: "name of the group"
 	});
 	let msg = new groupModel({
 		path: path_result,
 		label:label_result,	
+		repository: repoURL.url
 	});
 	msg.save()
 	.then((msg:any)=>{
@@ -230,7 +246,6 @@ export async function MFaddGroup(name:vscode.Uri|DocViewItem|any = vscode.window
 		console.error(err);
 	});
 }
-
 
 
 function sleep(ms: number) {
