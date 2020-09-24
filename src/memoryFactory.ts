@@ -7,24 +7,27 @@ import {repoURL} from "./allDocview";
 let DocModel = require('./models/document');
 let groupModel = require('./models/group');
 
-function calcToReviewDate(reviewed_dates:[Date]):Date{
-	var reviewRank = 0;
-	const toReviewDate = new Date(reviewed_dates[0].getTime());
-	for (let i = 0; i < reviewed_dates.length; i++) {
-		const rwdate = reviewed_dates[i];
-		var Difference_In_Time = rwdate.getTime() - toReviewDate.getTime(); 
+function calcToReviewDate(reviewed_dates:[Date], reviewLevel:number ):Date{
+
+	// the default review Level is 1, However, make the minimal to 2
+	reviewLevel = Math.max(reviewLevel+1,2); 
+	// mimic the process of forgetting and review as energy, dissipate in linear, and refill in exponent
+	var reviewEnergy:number = reviewLevel*2-2; 
+	var dateP = new Date(reviewed_dates[0].getTime()); dateP.setUTCHours(0,0,0);
+	for (let i = 1; i < reviewed_dates.length; i++) {
+		const rwdate = reviewed_dates[i]; rwdate.setUTCHours(0,0,0);
+		const Difference_In_Time = rwdate.getTime() - dateP.getTime(); 
 		// To calculate the no. of days between two dates 
-		var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24); 
-		if(Difference_In_Days<-Math.pow(2,reviewRank-1)){ // reviewed too early
-			toReviewDate.setDate(rwdate.getDate() + Math.pow(2,reviewRank));
-		}else if(Difference_In_Days<1){
-			reviewRank = reviewRank+1;
-			toReviewDate.setDate(rwdate.getDate() + Math.pow(2,reviewRank));
-		}else{
-			reviewRank =  reviewRank-1;
-			toReviewDate.setDate(rwdate.getDate() + Math.pow(2,reviewRank));
-		}
+		const Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24); 
+		dateP = rwdate;
+
+		const leftEnergy =  Math.max(reviewEnergy - Difference_In_Days, reviewLevel);
+		reviewEnergy = leftEnergy + reviewLevel * Math.min(Difference_In_Days, leftEnergy);
 	}
+
+	//set the toReviewDate as the last date plus half of the energy (the most optimal time for review)
+	const toReviewDate = new Date(dateP.getTime());
+	toReviewDate.setDate(toReviewDate.getDate()+Math.ceil(reviewEnergy/2));
 	return toReviewDate;
 }
 
@@ -58,13 +61,29 @@ export async function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.
 	.catch((err:any)=>{
 		console.error(err);
 	});
-	
-	const g = await groupModel.findOne({"path":{"$in":msg.ancestors},
+
+	var g = await groupModel.findOne({"path":{"$in":msg.ancestors},
 										"repository":repoURL.url})
 							.catch(err =>{console.error(err)});
+	
+	// TODO: The ancestors does not get updated in time
+	console.log(msg.ancestors);
+	console.log(g);
 	if(!g){ // the doc does not belongs to any group
-		await MFaddGroup(name);
+		g = await MFaddGroup(name);
 	}
+	
+	msg.reviewLevel = g.reviewLevel;
+
+	msg.save()
+	.then((msg:any)=>{
+		vscode.commands.executeCommand('MF-all-documents.refresh');
+		vscode.commands.executeCommand('MF-need-review-doc.refresh');
+	})
+	.catch((err:any)=>{
+		console.error(err);
+	});
+	
 }
 
 
@@ -113,9 +132,10 @@ export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTe
 	// push the reviewed_date
 	const Doc = await DocModel.findOne({doc: path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath),
 										repository:repoURL.url});
-	Doc.reviewed_dates.push(new Date());
+	const today0 = new Date(); today0.setUTCHours(0,1,0);
+	Doc.reviewed_dates.push(today0);
 	// Calc the to review date
-	const targetToReivew:Date = calcToReviewDate(Doc.reviewed_dates);
+	const targetToReivew:Date = calcToReviewDate(Doc.reviewed_dates, Doc.reviewLevel);
 	const toReview:Date = await QuickPickDate(targetToReivew);
 	// update the to_review date
 	Doc.toreview_date = toReview;
@@ -245,6 +265,7 @@ export async function MFaddGroup(name:vscode.Uri|DocViewItem|any = vscode.window
 	.catch((err:any)=>{
 		console.error(err);
 	});
+	return msg;
 }
 
 

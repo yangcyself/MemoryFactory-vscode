@@ -25,6 +25,10 @@ let docSchema = new mongoose.Schema({
 		type: Number,
 		default: 1
 	},
+	reviewLevel:{ // the factor for calculating the reviewperiod, initialized same as the group one.
+		type: Number,
+		default: 1
+	},
 	ancestors:{
 		type: [String]
 	},
@@ -40,8 +44,8 @@ docSchema.pre('save', function (next) {
 
 	const pathItems = this.doc.split(path.sep);
 	const ancsArray:string[] = [pathItems[0]];
-	for (let i = 1; i < pathItems.length; i++) {
-		ancsArray.push(path.join(ancsArray[ancsArray.length - 1],pathItems[i]));
+	for (let i = 1; i < pathItems.length-1; i++) {
+		ancsArray.push(path.posix.join(ancsArray[ancsArray.length - 1],pathItems[i]));
 	}
 	this.ancestors = ancsArray;
 	// Call the next function in the pre-save chain

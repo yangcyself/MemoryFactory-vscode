@@ -12,10 +12,10 @@ let groupSchema = new mongoose.Schema({
 	label:{
 		type: String
 	},
-	difficulty:{ // numbers of 20min required
-		type: Number,
-		default: 1
-	},
+	// difficulty:{ // numbers of 20min required
+	// 	type: Number,
+	// 	default: 1
+	// },
 	reviewLevel:{ // the factor for calculating the reviewperiod
 		type: Number,
 		default: 1
