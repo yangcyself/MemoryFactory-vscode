@@ -45,7 +45,7 @@ docSchema.pre('save', function (next) {
 	const pathItems = this.doc.split(path.sep);
 	const ancsArray:string[] = [pathItems[0]];
 	for (let i = 1; i < pathItems.length-1; i++) {
-		ancsArray.push(path.posix.join(ancsArray[ancsArray.length - 1],pathItems[i]));
+		ancsArray.push(path.join(ancsArray[ancsArray.length - 1],pathItems[i]));
 	}
 	this.ancestors = ancsArray;
 	// Call the next function in the pre-save chain

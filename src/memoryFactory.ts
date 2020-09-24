@@ -53,7 +53,7 @@ export async function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.
 		repository: repoURL.url
 	});
 	
-	msg.save()
+	await msg.save()
 	.then((msg:any)=>{
 		vscode.commands.executeCommand('MF-all-documents.refresh');
 		vscode.commands.executeCommand('MF-need-review-doc.refresh');
@@ -66,9 +66,6 @@ export async function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.
 										"repository":repoURL.url})
 							.catch(err =>{console.error(err)});
 	
-	// TODO: The ancestors does not get updated in time
-	console.log(msg.ancestors);
-	console.log(g);
 	if(!g){ // the doc does not belongs to any group
 		g = await MFaddGroup(name);
 	}
