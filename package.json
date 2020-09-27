@@ -73,6 +73,11 @@
 			{
 				"command": "MemoryFactory.addGroup",
 				"title": "Memory Factory: Add group"
+			},
+			{
+				"command": "catCoding.start",
+				"title": "Start new cat coding session",
+				"category": "Cat Coding"
 			}
 		],
 		"menus": {
