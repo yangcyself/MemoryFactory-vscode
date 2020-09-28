@@ -75,9 +75,12 @@
 				"title": "Memory Factory: Add group"
 			},
 			{
-				"command": "catCoding.start",
-				"title": "Start new cat coding session",
-				"category": "Cat Coding"
+				"command": "MemoryFactory.showInfoPage",
+				"title": "Memory Factory: show Info Page"
+			},
+			{
+				"command": "MemoryFactory.updateDocInfo",
+				"title": "Memory Factory: update Info Page"
 			}
 		],
 		"menus": {

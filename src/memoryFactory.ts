@@ -265,6 +265,34 @@ export async function MFaddGroup(name:vscode.Uri|DocViewItem|any = vscode.window
 	return msg;
 }
 
+export async function MFgetDocJson(name:vscode.Uri|DocViewItem|any = vscode.window.activeTextEditor.document.uri): Promise<String>
+{
+	const relapath = name.fsPath? path.relative(vscode.workspace.workspaceFolders[0].uri.fsPath, name.fsPath) : name.doc_path;
+	console.log(relapath);
+	const t =  await DocModel
+	.findOne({
+		doc: relapath,
+		repository: repoURL.url
+	}).then(doc => {const s = JSON.stringify(doc.toObject()); console.log(s);return s;})
+	.catch((err:any)=>{
+		console.error(err);
+	});
+	console.log(`T:${String(t)}`);
+	return String(t);	
+}
+
+export function updateJsonDoc(jdoc: any)
+{
+
+	DocModel.updateOne(
+		{doc: jdoc.doc},
+		jdoc // NOTE the `update` do not execute save() middleware
+	).then(doc => {console.log(`DOC:${doc}`); return doc;})
+	.catch((err:any)=>{
+		console.error(err);
+	});
+}
+
 
 function sleep(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms*1000) );

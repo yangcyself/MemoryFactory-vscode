@@ -39,7 +39,7 @@ export function getWebviewContent(cat: keyof typeof cats) {
 		</style>
 	</head>
 	<body>
-		<div contenteditable="true">
+		<div id="editBox" contenteditable="true">
 			This text can be edited by the user.
 		</div>
 		<button class="button button1" onclick="setMessage()" >set</button>
@@ -50,6 +50,7 @@ export function getWebviewContent(cat: keyof typeof cats) {
 			
 		<script>
 			const counter = document.getElementById('lines-of-code-counter');
+			const editBox = document.getElementById('editBox');
 	
 			let count = 0;
 			setInterval(() => {
@@ -58,10 +59,25 @@ export function getWebviewContent(cat: keyof typeof cats) {
 			const vscode = acquireVsCodeApi();
 			function setMessage(){
 				vscode.postMessage({
-					command: 'alert',
-					text: '🐛  on line ' + count
+					command: 'log',
+					text: editBox.textContent
 				})
 			}
+
+			window.addEventListener('message', event => {
+
+				const message = event.data; // The JSON data our extension sent
+	
+				switch (message.command) {
+					case 'refactor':
+						count = Math.ceil(count * 0.5);
+						counter.textContent = count;
+						break;
+					case 'update':
+						editBox.textContent = message.text;
+						break;
+				}
+			});
 		</script>
 	</body>
 	</html>`;

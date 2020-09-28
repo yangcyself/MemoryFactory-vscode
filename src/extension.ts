@@ -7,6 +7,7 @@ import {MFaddDoc, MFdeleteDoc, MFaddReviewedDate, MFsetToReviewDate} from './mem
 import {MFaddGroup} from './memoryFactory';
 import { join } from 'path';
 import { getWebviewContent } from "./getwebpage";
+import { MFgetDocJson, updateJsonDoc } from "./memoryFactory";
 
 export async function activate(context: vscode.ExtensionContext) {
 	// let msg = new DocModel({
@@ -36,22 +37,27 @@ export async function activate(context: vscode.ExtensionContext) {
 	
 	vscode.window.showInformationMessage(`Memory factory started`);
 
-	
-	vscode.commands.registerCommand('catCoding.start', () => {
+	let currentPanel: vscode.WebviewPanel | undefined = undefined;
+
+	vscode.commands.registerCommand('MemoryFactory.showInfoPage', () => {
 		// Create and show a new webview
-		const panel = vscode.window.createWebviewPanel(
-		'catCoding', // Identifies the type of the webview. Used internally
-		'Cat Coding', // Title of the panel displayed to the user
-		vscode.ViewColumn.One, // Editor column to show the new webview panel in.
-		{
-			enableScripts: true
-		} // Webview options. More on these later.
-		);
+		if (currentPanel) {
+			currentPanel.reveal(vscode.ViewColumn.One);
+		  } else {
+			currentPanel = vscode.window.createWebviewPanel(
+			  'catCoding',
+			  'Cat Coding',
+			  vscode.ViewColumn.One,
+			  {
+				enableScripts: true
+			  }
+			);
+		}
 		let iteration = 0;
 		const updateWebview = () => {
 		  const cat = iteration++ % 2 ? 'Compiling Cat' : 'Coding Cat';
-		  panel.title = cat;
-		  panel.webview.html = getWebviewContent(cat);
+		  currentPanel.title = cat;
+		  currentPanel.webview.html = getWebviewContent(cat);
 		};
   
 		// Set initial content
@@ -60,7 +66,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		// And schedule updates to the content every second
 		const interval = setInterval(updateWebview, 10000);
 
-		panel.onDidDispose(
+		currentPanel.onDidDispose(
 			() => {
 			  // When the panel is closed, cancel any future updates to the webview content
 			  clearInterval(interval);
@@ -69,20 +75,32 @@ export async function activate(context: vscode.ExtensionContext) {
 			context.subscriptions
 		);
 
-		panel.webview.onDidReceiveMessage(
+		currentPanel.webview.onDidReceiveMessage(
 			message => {
 			  switch (message.command) {
 				case 'alert':
 				  vscode.window.showErrorMessage(message.text);
 				  return;
 				case 'log':
-				  console.log(message.text);
-					return;
+				  updateJsonDoc(JSON.parse(message.text));
+				  return;
 			  }
 			},
 			undefined,
 			context.subscriptions
 		);
-	})
+	});
+	context.subscriptions.push(
+		vscode.commands.registerCommand('MemoryFactory.updateDocInfo', async () => {
+		  if (!currentPanel) {
+			return;
+		  }
+		  // Send a message to our webview.
+		  // You can send any JSON serializable data.
+		//   currentPanel.webview.postMessage({ command: 'refactor' });
+		  currentPanel.webview.postMessage({ command: 'update', 
+											text: await MFgetDocJson()});
+		})
+	  );
 
 }
