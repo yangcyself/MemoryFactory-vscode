@@ -273,12 +273,12 @@ export async function MFgetDocJson(name:vscode.Uri|DocViewItem|any = vscode.wind
 	.findOne({
 		doc: relapath,
 		repository: repoURL.url
-	}).then(doc => {const s = JSON.stringify(doc.toObject()); console.log(s);return s;})
+	}).then(doc => JSON.stringify(doc.toObject(),null,'\t'))
 	.catch((err:any)=>{
 		console.error(err);
 	});
-	console.log(`T:${String(t)}`);
-	return String(t);	
+	console.log(`T:${t}`);
+	return t;	
 }
 
 export function updateJsonDoc(jdoc: any)

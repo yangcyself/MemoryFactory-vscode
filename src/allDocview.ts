@@ -138,7 +138,6 @@ export class Document extends vscode.TreeItem implements AllDocViewElement{
     public readonly toReivewDate:Date
   ) {
     super(label, collapsibleState);
-    // this.doc_path = doc;
     this.elemType = AllDocViewElementType.document;
     this.command = { command: 'MemoryFactory.openFile', title: "Open File", arguments: [this.doc_path], };
     this.description = toReivewDate.toDateString();

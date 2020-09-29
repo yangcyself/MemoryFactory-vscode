@@ -1,17 +1,11 @@
 
-const cats = {
-	'Coding Cat': 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif',
-	'Compiling Cat': 'https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif'
-};
-
-export function getWebviewContent(cat: keyof typeof cats) {
+export function getWebviewContent() {
 	return `<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Cat Coding</title>
-
 		<style>
 			.button {
 			border: none;
@@ -36,15 +30,20 @@ export function getWebviewContent(cat: keyof typeof cats) {
 			background-color: #4CAF50;
 			color: white;
 			}
+
+			.mydiv{
+				white-space: pre-line;
+			}
 		</style>
 	</head>
 	<body>
-		<div id="editBox" contenteditable="true">
-			This text can be edited by the user.
+		<div class="mydiv" id="editBox" contenteditable="true">
+			Please select a document to show its information
+		
 		</div>
 		<button class="button button1" onclick="setMessage()" >set</button>
+		<br>
 
-		
 		<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="300" />
 		<h1 id="lines-of-code-counter">0</h1>
 			

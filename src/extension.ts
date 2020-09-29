@@ -9,6 +9,8 @@ import { join } from 'path';
 import { getWebviewContent } from "./getwebpage";
 import { MFgetDocJson, updateJsonDoc } from "./memoryFactory";
 
+let currentPanel: vscode.WebviewPanel | undefined = undefined;
+
 export async function activate(context: vscode.ExtensionContext) {
 	// let msg = new DocModel({
 	// 	doc: "tmp/test1",
@@ -30,6 +32,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('MemoryFactory.setToreviewDate', MFsetToReviewDate);
 	vscode.commands.registerCommand('MemoryFactory.openFile', (resource) => {
 		vscode.window.showInformationMessage(`open file ${resource}`);
+		vscode.commands.executeCommand('MemoryFactory.updateDocInfo');
 		vscode.window.showTextDocument(vscode.Uri.file(join(vscode.workspace.workspaceFolders[0].uri.fsPath, resource)))});
 	vscode.commands.registerCommand('MemoryFactory.addReviewedDate', MFaddReviewedDate);
 	// group related commands
@@ -37,39 +40,32 @@ export async function activate(context: vscode.ExtensionContext) {
 	
 	vscode.window.showInformationMessage(`Memory factory started`);
 
-	let currentPanel: vscode.WebviewPanel | undefined = undefined;
-
 	vscode.commands.registerCommand('MemoryFactory.showInfoPage', () => {
 		// Create and show a new webview
 		if (currentPanel) {
-			currentPanel.reveal(vscode.ViewColumn.One);
+			currentPanel.reveal(vscode.ViewColumn.Two);
 		  } else {
 			currentPanel = vscode.window.createWebviewPanel(
 			  'catCoding',
 			  'Cat Coding',
-			  vscode.ViewColumn.One,
+			  vscode.ViewColumn.Two,
 			  {
 				enableScripts: true
 			  }
 			);
 		}
-		let iteration = 0;
+		
 		const updateWebview = () => {
-		  const cat = iteration++ % 2 ? 'Compiling Cat' : 'Coding Cat';
-		  currentPanel.title = cat;
-		  currentPanel.webview.html = getWebviewContent(cat);
+		  currentPanel.title = 'document Info';
+		  currentPanel.webview.html = getWebviewContent();
 		};
   
 		// Set initial content
 		updateWebview();
-  
-		// And schedule updates to the content every second
-		const interval = setInterval(updateWebview, 10000);
-
+		
 		currentPanel.onDidDispose(
 			() => {
-			  // When the panel is closed, cancel any future updates to the webview content
-			  clearInterval(interval);
+				currentPanel = null;
 			},
 			null,
 			context.subscriptions
@@ -90,17 +86,16 @@ export async function activate(context: vscode.ExtensionContext) {
 			context.subscriptions
 		);
 	});
-	context.subscriptions.push(
-		vscode.commands.registerCommand('MemoryFactory.updateDocInfo', async () => {
-		  if (!currentPanel) {
-			return;
-		  }
-		  // Send a message to our webview.
-		  // You can send any JSON serializable data.
-		//   currentPanel.webview.postMessage({ command: 'refactor' });
-		  currentPanel.webview.postMessage({ command: 'update', 
-											text: await MFgetDocJson()});
-		})
-	  );
+	
+	vscode.commands.registerCommand('MemoryFactory.updateDocInfo', async () => {
+		if (!currentPanel) {
+		return;
+		}
+		// Send a message to our webview.
+		// You can send any JSON serializable data.
+		// currentPanel.webview.postMessage({ command: 'refactor' });
+		currentPanel.webview.postMessage({ command: 'update', 
+										text: await MFgetDocJson()});
+	})
 
 }
