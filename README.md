@@ -1,4 +1,4 @@
-# Memory Factory - VScode
+# <img style="float: left;" src="media/ji.svg" height="35"> &nbsp;&nbsp;Memory Factory - VScode
 
 A vscode extension that organize your documents for review. The extension connects a local MongoDB for storing your review dates and plan, and calculates the date for next review.
 
@@ -46,3 +46,14 @@ To facilitate the cross-platform potential, the extension recognize repos from i
 At the first time you use a memory repo, click on the `Add Repo` butten and the repo will be initiated in your database.
 
 ### Group Operations
+
+
+## Get Started
+
+Install a mongoDB on your machine, make sure that the database configuration in [`database.ts`](./src/database.ts) is correct.
+
+Initialize a git repository to keep your documents to memorize. Please make sure that the repo have an `origin` url in its `git remote`, as the url is used as an identifier for the repository.
+
+Install the extension locally following [this link](https://vscode-docs.readthedocs.io/en/stable/extensions/install-extension/)
+
+Restart the repo for you to memorize and find the logo in the navigation bar.
