@@ -57,3 +57,6 @@ Initialize a git repository to keep your documents to memorize. Please make sure
 Install the extension locally following [this link](https://vscode-docs.readthedocs.io/en/stable/extensions/install-extension/)
 
 Restart the repo for you to memorize and find the logo in the navigation bar.
+
+
+> Another similar and WEB APP can be found at http://mf.iimt.me/login.
