@@ -50,7 +50,7 @@ At the first time you use a memory repo, click on the `Add Repo` butten and the 
 
 ## Get Started
 
-Install a mongoDB on your machine, make sure that the database configuration in [`database.ts`](./src/database.ts) is correct.
+Install a [mongoDB](https://www.mongodb.com/) on your machine, make sure that the database configuration in [`database.ts`](./src/database.ts) is correct.
 
 Initialize a git repository to keep your documents to memorize. Please make sure that the repo have an `origin` url in its `git remote`, as the url is used as an identifier for the repository.
 
