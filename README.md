@@ -59,4 +59,4 @@ Install the extension locally following [this link](https://vscode-docs.readthed
 Restart the repo for you to memorize and find the logo in the navigation bar.
 
 
-> Another similar and WEB APP can be found at http://mf.iimt.me/login.
+> Another similar and WEB-based APP can be found at http://mf.iimt.me/login.
