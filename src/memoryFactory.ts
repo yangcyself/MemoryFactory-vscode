@@ -31,6 +31,16 @@ function calcToReviewDate(reviewed_dates:[Date], reviewLevel:number ):Date{
 	return toReviewDate;
 }
 
+export function MFrewardMySelf(key){
+	// key is a string to be compare with the string in the function, if not same, do nothing
+	if(key!="safe") return;
+	const happyPath = "<happyPath>";
+	var fs = require('fs');
+	const files = fs.readdirSync(happyPath);
+	const randomfile = files[Math.floor(Math.random() * files.length)];
+	vscode.commands.executeCommand('vscode.open',vscode.Uri.file(path.join(happyPath,randomfile)));
+}
+
 export async function MFaddDoc(name:vscode.Uri = vscode.window.activeTextEditor.document.uri){
 	//vscode.workspace.workspaceFolders[0]: The rootPath
 	// vscode.window.showInformationMessage(`Successfully called add doc.${name.fsPath}\nFrom workSpaceFolder${vscode.workspace.workspaceFolders[0].name}`);

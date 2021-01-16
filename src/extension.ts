@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 
 import {AllDocViewProvider, NeedReviewDocViewProvider} from './allDocview';
-import {MFaddDoc, MFdeleteDoc, MFaddReviewedDate, MFsetToReviewDate} from './memoryFactory';
+import {MFaddDoc, MFdeleteDoc, MFaddReviewedDate, MFsetToReviewDate, MFrewardMySelf} from './memoryFactory';
 import {MFaddGroup} from './memoryFactory';
 import { join } from 'path';
 import { getWebviewContent } from "./getwebpage";
@@ -31,7 +31,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('MemoryFactory.deleteDoc', MFdeleteDoc);
 	vscode.commands.registerCommand('MemoryFactory.setToreviewDate', MFsetToReviewDate);
 	vscode.commands.registerCommand('MemoryFactory.openFile', (resource) => {
-		vscode.window.showInformationMessage(`open file ${resource}`);
+		vscode.window.showInformationMessage(`open file ${resource}`,"safe")
+			.then(selection => {console.log(selection); MFrewardMySelf(selection)});
 		vscode.commands.executeCommand('MemoryFactory.updateDocInfo');
 		vscode.window.showTextDocument(vscode.Uri.file(join(vscode.workspace.workspaceFolders[0].uri.fsPath, resource)))});
 	vscode.commands.registerCommand('MemoryFactory.addReviewedDate', MFaddReviewedDate);
