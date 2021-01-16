@@ -119,7 +119,8 @@ export function MFdeleteDoc(name:vscode.Uri|DocViewItem|any = vscode.window.acti
 
 export async function MFaddReviewedDate(name:vscode.Uri = vscode.window.activeTextEditor.document.uri){
 	//vscode.workspace.workspaceFolders[0]: The rootPath
-	vscode.window.showInformationMessage(`Successfully called add review time stamp.${name.fsPath}\nFrom workSpaceFolder${vscode.workspace.workspaceFolders[0].name}`);
+	vscode.window.showInformationMessage(`Successfully called add review time stamp.${name.fsPath}\nFrom workSpaceFolder${vscode.workspace.workspaceFolders[0].name}`,
+		"safe").then(selection => {console.log(selection); MFrewardMySelf(selection)});
 	// TODO: change this part an atomic operation (although not required in MF)
 
 	// DocModel.findOneAndUpdate(

@@ -31,8 +31,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('MemoryFactory.deleteDoc', MFdeleteDoc);
 	vscode.commands.registerCommand('MemoryFactory.setToreviewDate', MFsetToReviewDate);
 	vscode.commands.registerCommand('MemoryFactory.openFile', (resource) => {
-		vscode.window.showInformationMessage(`open file ${resource}`,"safe")
-			.then(selection => {console.log(selection); MFrewardMySelf(selection)});
+		vscode.window.showInformationMessage(`open file ${resource}`);
 		vscode.commands.executeCommand('MemoryFactory.updateDocInfo');
 		vscode.window.showTextDocument(vscode.Uri.file(join(vscode.workspace.workspaceFolders[0].uri.fsPath, resource)))});
 	vscode.commands.registerCommand('MemoryFactory.addReviewedDate', MFaddReviewedDate);
