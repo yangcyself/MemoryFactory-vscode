@@ -16,6 +16,17 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "memory-factory",
+			"properties": {
+			  "memoryFactory.HappyPath": {
+				"type": "string",
+				"scope": "application",
+				"default": "None",
+				"description": "Specifies the folder path containing the entertaining files"
+			  }
+			}
+		},
 		"viewsContainers": {
 			"activitybar": [
 				{

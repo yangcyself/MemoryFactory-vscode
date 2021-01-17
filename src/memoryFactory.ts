@@ -34,7 +34,12 @@ function calcToReviewDate(reviewed_dates:[Date], reviewLevel:number ):Date{
 export function MFrewardMySelf(key){
 	// key is a string to be compare with the string in the function, if not same, do nothing
 	if(key!="safe") return;
-	const happyPath = "<happyPath>";
+	const workbenchConfig = vscode.workspace.getConfiguration('memoryFactory')
+	if(!vscode.workspace.getConfiguration('memoryFactory').has("HappyPath")){
+		console.log("Not found key memoryFactory.HappyPath");
+		return;
+	}
+	const happyPath = String(vscode.workspace.getConfiguration('memoryFactory').get("HappyPath"));
 	var fs = require('fs');
 	const files = fs.readdirSync(happyPath);
 	const randomfile = files[Math.floor(Math.random() * files.length)];
