@@ -50,19 +50,40 @@ At the first time you use a memory repo, click on the `Add Repo` butten and the 
 
 ## Get Started
 
-Install a [mongoDB](https://www.mongodb.com/) on your machine, make sure that the database configuration in [`database.ts`](./src/database.ts) is correct.
+### Build your git repository to review
 
 Initialize a git repository to keep your documents to memorize. Please make sure that the repo have an `origin` url in its `git remote`, as the url is used as an identifier for the repository.
 
+### Install the vscode extension
+
 Install the extension locally following [this link](https://vscode-docs.readthedocs.io/en/stable/extensions/install-extension/)
 
-Restart the repo for you to memorize and find the logo in the navigation bar.
+VS Code looks for extensions under your extensions folder .vscode/extensions. Depending on your platform it is located:
 
-Run the following commend to compile ts.
+**Git clone this repo into the path of your extension**
+
+- Windows `%USERPROFILE%\.vscode\extensions`
+- Mac `$HOME/.vscode/extensions`
+- Linux `$HOME/.vscode/extensions`
+
+**Configure the database login**
+
+```bash
+# in src
+cp serverPassExample.ts serverPass.ts
+```
+
+Add then fill in the database information.
+
+**Run the following commend to compile ts.**
 
 ```bash
 npm run compile
 ```
+
+### Use
+
+Restart the repo for you to memorize and find the logo in the navigation bar.
 
 ## Misc
 
