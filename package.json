@@ -155,6 +155,6 @@
 		"mongoose": "^5.9",
 		"path": "^0.12.7",
 		"rimraf": "^2.6.2",
-		"simple-git": "^2.20.1"
+		"simple-git": "^3.3.0"
 	}
 }
