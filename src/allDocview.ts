@@ -186,6 +186,8 @@ class RepoURL
           baseDir: vscode.workspace.rootPath,
           binary: 'git',
           maxConcurrentProcesses: 6,
+          config:[],
+          trimmed: true
         };
         const git: SimpleGit = simpleGit(options);
         const gitroot =  git.remote(['get-url','origin']);

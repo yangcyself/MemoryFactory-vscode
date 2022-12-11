@@ -6,3 +6,4 @@ fileExplorer.ts
 USAGE.md
 package-lock.json
 src/serverPass.ts
+src/*.js
