@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 // import * as path from 'path';
 import { Database } from './database';
 import simpleGit, {SimpleGit,SimpleGitOptions} from 'simple-git'; // used in singelon repoUrl
-
+import { pathgetter,pathsetter } from "./utils/pathutil";
 
 let DocModel = require('./models/document');
 let GroupModel = require('./models/group');
@@ -36,7 +36,7 @@ export class AllDocViewProvider implements vscode.TreeDataProvider<Document> {
     } else if (element && element.elemType==AllDocViewElementType.group){
       return Promise.resolve( 
         DocModel.find(
-          {"ancestors": element.doc_path,
+          {"ancestors": pathsetter(element.doc_path),
            "repository":repoURL.url}
         )
         .then((doc:[any]) => {
