@@ -98,7 +98,13 @@ export class NeedReviewDocViewProvider implements vscode.TreeDataProvider<Docume
       return Promise.all(doc.map(async (d:any) =>  {
         const g = await GroupModel.findOne({"path":{"$in":d.ancestors},
                                             "repository":repoURL.url}).catch(err =>{console.error(err)});
-        return new Document(`${g.label} ${d.label}`,  vscode.TreeItemCollapsibleState.None,
+        var g_label:string;
+        if(g ==null){
+          g_label = "????";
+        }else{
+          g_label = g.label;
+        }
+        return new Document(`${g_label} ${d.label}`,  vscode.TreeItemCollapsibleState.None,
                                             d.doc,    d.toreview_date)}));
 		  })
 		  .catch(err => {
