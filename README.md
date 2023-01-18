@@ -1,4 +1,4 @@
-# <img style="float: left;" src="media/ji.svg" height="35"> &nbsp;&nbsp;Memory Factory - VScode
+# <img style="float: left;" src="media/ji.png" height="35"> &nbsp;&nbsp;Memory Factory - VScode
 
 A vscode extension that organize your documents for review. The extension connects a local MongoDB for storing your review dates and plan, and calculates the date for next review.
 

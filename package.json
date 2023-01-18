@@ -5,6 +5,10 @@
 	"version": "0.0.1",
 	"publisher": "yangcyself",
 	"enableProposedApi": true,
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:yangcyself/MemoryFactory-vscode.git"
+	},
 	"engines": {
 		"vscode": "^1.74.0"
 	},
