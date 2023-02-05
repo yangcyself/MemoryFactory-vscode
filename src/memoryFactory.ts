@@ -40,8 +40,11 @@ export function MFrewardMySelf(key){
 		return;
 	}
 	const happyPath = String(vscode.workspace.getConfiguration('memoryFactory').get("HappyPath"));
-	var fs = require('fs');
-	const files = fs.readdirSync(happyPath);
+	var glob = require("glob");
+	var files = [];
+	for (const p of happyPath.split(";")){
+		files = files.concat(glob.sync(p));
+	}
 	const randomfile = files[Math.floor(Math.random() * files.length)];
 	vscode.commands.executeCommand('vscode.open',vscode.Uri.file(path.join(happyPath,randomfile)));
 }

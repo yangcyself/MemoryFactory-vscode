@@ -88,3 +88,9 @@ Restart the repo for you to memorize and find the logo in the navigation bar.
 ## Misc
 
 > Another similar and WEB-based APP can be found at http://mf.iimt.me/login.
+
+### Pack:
+
+```bash
+vsce pack--baseContentUrl https://github.com/yangcyself/MemoryFactory-vscode.git
+```
